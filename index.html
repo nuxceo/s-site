@@ -5,11 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>For My Sweet Sana</title>
   <style>
-    /* Background and body */
+    /* Minimalistic background image */
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #e0c3fc, #8ec5fc); /* Soft purple-blue gradient */
       color: #8B0000;
       text-align: center;
       padding: 40px 20px;
@@ -18,51 +17,85 @@
       position: relative;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      background: linear-gradient(135deg, #e0c3fc, #8ec5fc);
+      /* Background image: subtle minimalistic, low opacity */
+      background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+    }
+
+    /* Overlay for darkening the background image gently */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(30, 0, 30, 0.4); /* dark purple overlay */
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Matrix-like romantic code streams */
+    #matrix {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+      mix-blend-mode: screen;
+      opacity: 0.1; /* subtle 10% effect */
     }
 
     h1 {
       font-size: 3em;
-      color: #5f0000;
+      color: #ffd6e8;
       margin-bottom: 1em;
-      text-shadow: 1px 1px 3px rgba(255, 100, 100, 0.7);
+      text-shadow: 0 0 15px #ff7fa1, 0 0 30px #ff4c81;
       position: relative;
       z-index: 10;
       user-select: none;
     }
 
-    /* Glass container common style */
+    /* Glass containers */
     .glass-container {
-      background: rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.12);
       border-radius: 30px;
-      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-      backdrop-filter: blur(15px);
-      -webkit-backdrop-filter: blur(15px);
+      box-shadow: 0 8px 32px 0 rgba(255, 105, 180, 0.4);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(255, 255, 255, 0.3);
       padding: 40px 30px;
       margin: 30px auto;
       max-width: 720px;
-      color: #4b0000;
+      color: #ffcade;
       position: relative;
       z-index: 10;
+      transition: box-shadow 0.3s ease;
+    }
+    .glass-container:hover {
+      box-shadow: 0 12px 48px 0 rgba(255, 105, 180, 0.6);
     }
 
     .poem {
       font-style: italic;
-      color: #b22222;
+      color: #ff7fa1;
       line-height: 1.6;
-      font-size: 1.2em;
+      font-size: 1.25em;
     }
 
     .letter {
       font-size: 1.1em;
       line-height: 1.5;
+      color: #ffb3c6;
     }
 
     .letter .typing {
       display: inline-block;
       overflow: hidden;
       white-space: nowrap;
-      border-right: 3px solid #8B0000;
+      border-right: 3px solid #ff4c81;
       animation: typing 6s steps(60, end), blink-caret 0.75s step-end infinite;
       max-width: 100%;
     }
@@ -74,7 +107,7 @@
 
     @keyframes blink-caret {
       from, to { border-color: transparent }
-      50% { border-color: #8B0000 }
+      50% { border-color: #ff4c81 }
     }
 
     /* Heart Canvas */
@@ -82,16 +115,18 @@
       display: block;
       margin: 0 auto;
       border-radius: 30px;
-      box-shadow: 0 0 40px rgba(139, 0, 0, 0.4);
+      box-shadow: 0 0 60px rgba(255, 105, 180, 0.6);
       transition: transform 0.25s ease-in-out;
       cursor: pointer;
       background: transparent;
       max-width: 100%;
       height: auto;
+      position: relative;
+      z-index: 10;
     }
 
     #heartCanvas:hover {
-      transform: scale(1.05);
+      transform: scale(1.07);
     }
 
     /* Floating hearts */
@@ -120,11 +155,12 @@
     footer {
       margin-top: 50px;
       font-size: 1.3em;
-      color: #880e4f;
+      color: #ff4c81;
       font-weight: bold;
       position: relative;
       z-index: 10;
       user-select: none;
+      text-shadow: 0 0 10px #ff7fa1;
     }
 
     /* Responsive */
@@ -146,7 +182,7 @@
   <h1>For My Sweet Sana</h1>
 
   <div class="glass-container">
-    <canvas id="heartCanvas" width="700" height="700" aria-label="Heart made of dots"></canvas>
+    <canvas id="heartCanvas" width="800" height="800" aria-label="Heart made of dots"></canvas>
   </div>
 
   <div class="glass-container poem">
@@ -180,15 +216,18 @@
   <div class="floating-heart" style="left: 70%; top: 100%; animation-delay: 3s;"></div>
   <div class="floating-heart" style="left: 90%; top: 100%; animation-delay: 1.5s;"></div>
 
+  <!-- Matrix romantic code canvas -->
+  <canvas id="matrix"></canvas>
+
   <script>
+    // Heart canvas setup and animation
     const canvas = document.getElementById("heartCanvas");
     const ctx = canvas.getContext("2d");
 
-    // Particle params
     const particles = [];
-    const PARTICLE_RADIUS = 2.5;
-    const PARTICLE_GAP = 3.5; // smaller gap = denser heart
-    const HEART_SCALE = 20;    // larger scale for bigger heart
+    const PARTICLE_RADIUS = 3;
+    const PARTICLE_GAP = 3;
+    const HEART_SCALE = 23; // bigger heart scale
     const CENTER_X = canvas.width / 2;
     const CENTER_Y = canvas.height / 2 + 50;
 
@@ -198,7 +237,6 @@
       return Math.pow(tx*tx + ty*ty - 1, 3) - tx*tx*ty*ty*ty <= 0;
     }
 
-    // Generate particles inside heart shape
     for(let x = -CENTER_X; x < CENTER_X; x += PARTICLE_GAP) {
       for(let y = -CENTER_Y; y < CENTER_Y; y += PARTICLE_GAP) {
         if (isInsideHeart(x, y)) {
@@ -214,7 +252,7 @@
       }
     }
 
-    function draw() {
+    function drawHeart() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = "#8B0000";
       for (const p of particles) {
@@ -224,13 +262,13 @@
       }
     }
 
-    const SPRING = 0.12;
-    const FRICTION = 0.82;
+    const SPRING = 0.13;
+    const FRICTION = 0.8;
     const REPULSION_RADIUS = 70;
-    const REPULSION_STRENGTH = 0.6;
+    const REPULSION_STRENGTH = 0.65;
 
-    function animate() {
-      draw();
+    function animateHeart() {
+      drawHeart();
       for (const p of particles) {
         let dx = p.ox - p.x;
         let dy = p.oy - p.y;
@@ -241,7 +279,7 @@
         p.x += p.vx;
         p.y += p.vy;
       }
-      requestAnimationFrame(animate);
+      requestAnimationFrame(animateHeart);
     }
 
     function repelParticles(mx, my) {
@@ -270,9 +308,48 @@
       }
     });
 
-    canvas.addEventListener('mouseleave', () => {});
+    animateHeart();
 
-    animate();
+    // ----------- Matrix romantic effect -------------
+
+    const matrixCanvas = document.getElementById('matrix');
+    const mctx = matrixCanvas.getContext('2d');
+    matrixCanvas.width = window.innerWidth;
+    matrixCanvas.height = window.innerHeight;
+
+    const letters = "❤♥♠♦♣♤♡♧♦".split(''); // romantic symbols + hearts
+    const fontSize = 18;
+    const columns = Math.floor(matrixCanvas.width / fontSize);
+    const drops = [];
+
+    for(let x = 0; x < columns; x++)
+      drops[x] = Math.random() * matrixCanvas.height;
+
+    function drawMatrix() {
+      mctx.fillStyle = "rgba(30, 0, 30, 0.1)";
+      mctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+      mctx.fillStyle = "#ff4c81";
+      mctx.font = fontSize + "px monospace";
+
+      for(let i = 0; i < drops.length; i++) {
+        let text = letters[Math.floor(Math.random() * letters.length)];
+        let x = i * fontSize;
+        let y = drops[i] * fontSize;
+        mctx.fillText(text, x, y);
+
+        if (y > matrixCanvas.height && Math.random() > 0.975)
+          drops[i] = 0;
+        drops[i] += 0.7; // slow falling for romantic vibe
+      }
+      requestAnimationFrame(drawMatrix);
+    }
+    drawMatrix();
+
+    // Resize canvas on window resize
+    window.addEventListener('resize', () => {
+      matrixCanvas.width = window.innerWidth;
+      matrixCanvas.height = window.innerHeight;
+    });
   </script>
 </body>
 </html>
