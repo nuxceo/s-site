@@ -2,37 +2,68 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>For My Love, Sana</title>
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: linear-gradient(to right, #fce4ec, #f3e5f5);
-      color: #4a148c;
+      color: #8B0000;
       text-align: center;
       padding: 30px;
       overflow-x: hidden;
+      position: relative;
+      min-height: 100vh;
+    }
+
+    * {
+      transition: all 0.3s ease;
     }
 
     h1 {
       font-size: 3em;
-      color: #ad1457;
+      color: #5f0000;
       margin-bottom: 0.5em;
+      text-shadow: 1px 1px 3px rgba(255, 100, 100, 0.7);
+      position: relative;
+      z-index: 10;
     }
 
     .poem, .letter {
-      background: #ffffffcc;
+      background: rgba(255, 255, 255, 0.85);
       border-radius: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
       padding: 30px;
       margin: 20px auto;
       max-width: 700px;
+      backdrop-filter: blur(6px);
+      position: relative;
+      z-index: 10;
     }
 
     .poem {
       font-style: italic;
-      color: #6a1b9a;
+      color: #b22222;
+    }
+
+    .letter .typing {
+      display: inline-block;
+      overflow: hidden;
+      white-space: nowrap;
+      border-right: 3px solid #8B0000;
+      animation: typing 6s steps(60, end), blink-caret 0.75s step-end infinite;
+      max-width: 100%;
+    }
+
+    @keyframes typing {
+      from { width: 0 }
+      to { width: 100% }
+    }
+
+    @keyframes blink-caret {
+      from, to { border-color: transparent }
+      50% { border-color: #8B0000 }
     }
 
     canvas {
@@ -40,6 +71,47 @@
       margin: 40px auto;
       background: transparent;
       border-radius: 12px;
+      transition: transform 0.2s ease-in-out;
+      box-shadow: 0 0 20px rgba(139, 0, 0, 0.2);
+      position: relative;
+      z-index: 10;
+    }
+
+    canvas:hover {
+      transform: scale(1.02);
+    }
+
+    /* Floating Hearts Animation */
+    .floating-heart {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 105, 180, 0.8);
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: floatUp 6s infinite ease-in;
+      z-index: 1;
+      filter: drop-shadow(0 0 2px rgba(255, 105, 180, 0.7));
+    }
+
+    @keyframes floatUp {
+      0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-600px) scale(1.5);
+        opacity: 0;
+      }
+    }
+
+    footer {
+      margin-top: 60px;
+      font-size: 1.2em;
+      color: #880e4f;
+      font-weight: bold;
+      position: relative;
+      z-index: 10;
     }
   </style>
 </head>
@@ -62,19 +134,22 @@
 
   <div class="letter">
     <h2>A Letter from My Heart</h2>
-    <p>My dearest Sana,</p>
-    <p>
-      I made this little website just for you, to show how much you mean to me. I want you to know that I love you deeply, endlessly, and with all my heart.
-      Sometimes, I make mistakes — not because I don’t care, but because I’m human. Please know that I never mean to hurt you.
-    </p>
-    <p>
-      You are my sunshine, my soft breeze, my dream come true. Every moment with you is a treasure I hold close to my soul. Thank you for being you — so beautiful, so kind, so full of love.
-    </p>
-    <p>
+    <p class="typing">My dearest Sana,<br />
+      I made this little website just for you, to show how much you mean to me. I want you to know that I love you deeply, endlessly, and with all my heart. Sometimes, I make mistakes — not because I don’t care, but because I’m human. Please know that I never mean to hurt you.<br />
+      You are my sunshine, my soft breeze, my dream come true. Every moment with you is a treasure I hold close to my soul. Thank you for being you — so beautiful, so kind, so full of love.<br /><br />
       Forever yours,<br />
       <strong>Ali</strong>
     </p>
   </div>
+
+  <footer>With love, Ali 💌</footer>
+
+  <!-- Floating hearts elements -->
+  <div class="floating-heart" style="left: 10%; top: 100%; animation-delay: 0s;"></div>
+  <div class="floating-heart" style="left: 30%; top: 100%; animation-delay: 2s;"></div>
+  <div class="floating-heart" style="left: 50%; top: 100%; animation-delay: 1s;"></div>
+  <div class="floating-heart" style="left: 70%; top: 100%; animation-delay: 3s;"></div>
+  <div class="floating-heart" style="left: 90%; top: 100%; animation-delay: 1.5s;"></div>
 
   <script>
     const canvas = document.getElementById("heartCanvas");
@@ -82,6 +157,7 @@
     const particles = [];
     const spacing = 6;
 
+    // Heart formula - filled shape
     function isInHeart(x, y, scale = 1) {
       const tx = (x - canvas.width / 2) / scale / 16;
       const ty = (canvas.height / 2 - y) / scale;
