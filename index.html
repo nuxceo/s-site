@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For My Love, Sana</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(to right, #fce4ec, #f3e5f5);
+      color: #4a148c;
+      text-align: center;
+      padding: 30px;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-size: 3em;
+      color: #ad1457;
+      margin-bottom: 0.5em;
+    }
+
+    .poem, .letter {
+      background: #ffffffcc;
+      border-radius: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      padding: 30px;
+      margin: 20px auto;
+      max-width: 700px;
+    }
+
+    .poem {
+      font-style: italic;
+      color: #6a1b9a;
+    }
+
+    .heart {
+      font-size: 4em;
+      color: #ec407a;
+      animation: beat 1.5s infinite;
+    }
+
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+
+    canvas {
+      display: block;
+      margin: 30px auto;
+      background: transparent;
+    }
+  </style>
+</head>
+<body>
+  <div class="heart">
+    ❤
+  </div>
+  <h1>For My Sweet Sana</h1>
+
+  <canvas id="heartCanvas" width="400" height="400"></canvas>
+
+  <div class="poem">
+    <p>In every smile, in every star,<br />
+    I see your light from near and far.<br />
+    Your love, a song that soothes my soul,<br />
+    With you, my heart feels truly whole.</p>
+
+    <p>Through days of joy and nights so deep,<br />
+    You're in my thoughts, awake or asleep.<br />
+    If sometimes I may miss the mark,<br />
+    Know you're still my brightest spark.</p>
+  </div>
+
+  <div class="letter">
+    <h2>A Letter from My Heart</h2>
+    <p>My dearest Sana,</p>
+    <p>
+      I made this little website just for you, to show how much you mean to me. I want you to know that I love you deeply, endlessly, and with all my heart.
+      Sometimes, I make mistakes — not because I don’t care, but because I’m human. Please know that I never mean to hurt you.
+    </p>
+    <p>
+      You are my sunshine, my soft breeze, my dream come true. Every moment with you is a treasure I hold close to my soul. Thank you for being you — so beautiful, so kind, so full of love.
+    </p>
+    <p>
+      Forever yours,<br />
+      <strong>Your Love</strong>
+    </p>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("heartCanvas");
+    const ctx = canvas.getContext("2d");
+    let points = [];
+    const r = 10;
+    const heartFn = (t) => {
+      const x = 16 * Math.pow(Math.sin(t), 3);
+      const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+      return { x: 200 + x * 10, y: 200 - y * 10 };
+    };
+
+    for (let i = 0; i < 100; i++) {
+      const t = (Math.PI * 2 * i) / 100;
+      const pos = heartFn(t);
+      points.push({ x: pos.x, y: pos.y, ox: pos.x, oy: pos.y });
+    }
+
+    function drawHeart() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let point of points) {
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 3, 0, Math.PI * 2);
+        ctx.fillStyle = "#ec407a";
+        ctx.fill();
+      }
+    }
+
+    function animate() {
+      drawHeart();
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    canvas.addEventListener("touchmove", function (e) {
+      const touch = e.touches[0];
+      const rect = canvas.getBoundingClientRect();
+      const tx = touch.clientX - rect.left;
+      const ty = touch.clientY - rect.top;
+
+      for (let p of points) {
+        const dx = tx - p.x;
+        const dy = ty - p.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 50) {
+          p.x += dx * 0.2;
+          p.y += dy * 0.2;
+        } else {
+          p.x += (p.ox - p.x) * 0.05;
+          p.y += (p.oy - p.y) * 0.05;
+        }
+      }
+    }, false);
+  </script>
+</body>
+</html>
