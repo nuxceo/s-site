@@ -1,26 +1,22 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" >
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>For My Love, Sana</title>
+  <title>Perfect Filled Heart for Sana</title>
   <style>
+    /* ---- Body and General Styling ---- */
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #fce4ec, #f3e5f5);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #fce4ec, #f3e5f5);
       color: #8B0000;
       text-align: center;
       padding: 30px;
       overflow-x: hidden;
-      position: relative;
       min-height: 100vh;
+      position: relative;
     }
-
-    * {
-      transition: all 0.3s ease;
-    }
-
     h1 {
       font-size: 3em;
       color: #5f0000;
@@ -29,7 +25,6 @@
       position: relative;
       z-index: 10;
     }
-
     .poem, .letter {
       background: rgba(255, 255, 255, 0.85);
       border-radius: 20px;
@@ -41,12 +36,10 @@
       position: relative;
       z-index: 10;
     }
-
     .poem {
       font-style: italic;
       color: #b22222;
     }
-
     .letter .typing {
       display: inline-block;
       overflow: hidden;
@@ -55,17 +48,14 @@
       animation: typing 6s steps(60, end), blink-caret 0.75s step-end infinite;
       max-width: 100%;
     }
-
     @keyframes typing {
       from { width: 0 }
       to { width: 100% }
     }
-
     @keyframes blink-caret {
       from, to { border-color: transparent }
       50% { border-color: #8B0000 }
     }
-
     canvas {
       display: block;
       margin: 40px auto;
@@ -76,12 +66,10 @@
       position: relative;
       z-index: 10;
     }
-
     canvas:hover {
       transform: scale(1.02);
     }
-
-    /* Floating Hearts Animation */
+    /* Floating Hearts */
     .floating-heart {
       position: absolute;
       width: 20px;
@@ -93,7 +81,6 @@
       z-index: 1;
       filter: drop-shadow(0 0 2px rgba(255, 105, 180, 0.7));
     }
-
     @keyframes floatUp {
       0% {
         transform: translateY(0) scale(1);
@@ -104,7 +91,6 @@
         opacity: 0;
       }
     }
-
     footer {
       margin-top: 60px;
       font-size: 1.2em;
@@ -118,7 +104,7 @@
 <body>
   <h1>For My Sweet Sana</h1>
 
-  <canvas id="heartCanvas" width="500" height="500"></canvas>
+  <canvas id="heartCanvas" width="600" height="600"></canvas>
 
   <div class="poem">
     <p>In every smile, in every star,<br />
@@ -144,7 +130,7 @@
 
   <footer>With love, Ali 💌</footer>
 
-  <!-- Floating hearts elements -->
+  <!-- Floating hearts -->
   <div class="floating-heart" style="left: 10%; top: 100%; animation-delay: 0s;"></div>
   <div class="floating-heart" style="left: 30%; top: 100%; animation-delay: 2s;"></div>
   <div class="floating-heart" style="left: 50%; top: 100%; animation-delay: 1s;"></div>
@@ -154,69 +140,139 @@
   <script>
     const canvas = document.getElementById("heartCanvas");
     const ctx = canvas.getContext("2d");
-    const particles = [];
-    const spacing = 6;
 
-    // Heart formula - filled shape
-    function isInHeart(x, y, scale = 1) {
-      const tx = (x - canvas.width / 2) / scale / 16;
-      const ty = (canvas.height / 2 - y) / scale;
-      const a = Math.pow(tx * tx + ty * ty - 1, 3) - tx * tx * ty * ty * ty;
-      return a <= 0;
+    // Store particles in array
+    const particles = [];
+
+    // Heart particle parameters
+    const PARTICLE_RADIUS = 2;
+    const PARTICLE_GAP = 4; // smaller gap = denser particles
+    const HEART_SCALE = 15;
+    const CENTER_X = canvas.width / 2;
+    const CENTER_Y = canvas.height / 2 + 40;
+
+    // Generate heart shape points using parametric formula (filled heart)
+    // Parametric heart formula:
+    // x = 16 * sin(t)^3
+    // y = 13*cos(t) - 5*cos(2t) - 2*cos(3t) - cos(4t)
+    // for t in [0, 2*PI]
+    // We fill by sweeping over small grid points and check if inside heart polygon.
+
+    // Function to check if point is inside heart shape (using parametric boundary)
+    function heartFunction(t) {
+      return {
+        x: 16 * Math.pow(Math.sin(t), 3),
+        y: 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)
+      };
     }
 
-    for (let x = 0; x < canvas.width; x += spacing) {
-      for (let y = 0; y < canvas.height; y += spacing) {
-        if (isInHeart(x, y, 10)) {
-          particles.push({ x, y, ox: x, oy: y });
+    // For each particle candidate, check if inside heart polygon approx.
+    // Because the heart shape is symmetrical, use a function to check inside the shape.
+
+    // We'll use the heart implicit function: (x^2 + y^2 -1)^3 - x^2 y^3 <= 0 is inside
+    // We'll scale x and y appropriately
+
+    function isInsideHeart(x, y) {
+      // scale down
+      let tx = x / HEART_SCALE;
+      let ty = y / HEART_SCALE;
+      let val = Math.pow(tx*tx + ty*ty -1, 3) - tx*tx*ty*ty*ty;
+      return val <= 0;
+    }
+
+    // Generate particles grid inside the canvas, keep those inside heart shape
+    for(let x = -CENTER_X; x < CENTER_X; x += PARTICLE_GAP) {
+      for(let y = -CENTER_Y; y < CENTER_Y; y += PARTICLE_GAP) {
+        if (isInsideHeart(x, y)) {
+          particles.push({
+            x: CENTER_X + x,
+            y: CENTER_Y - y,
+            ox: CENTER_X + x, // original position
+            oy: CENTER_Y - y,
+            vx: 0,
+            vy: 0
+          });
         }
       }
     }
 
-    function drawParticles() {
+    // Draw particles
+    function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#8B0000";
       for (let p of particles) {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
-        ctx.fillStyle = "#8B0000";
+        ctx.arc(p.x, p.y, PARTICLE_RADIUS, 0, 2 * Math.PI);
         ctx.fill();
       }
     }
 
-    function animateParticles() {
-      drawParticles();
-      requestAnimationFrame(animateParticles);
+    // Physics variables for smooth animation
+    const SPRING = 0.1;
+    const FRICTION = 0.85;
+    const REPULSION_RADIUS = 60;
+    const REPULSION_STRENGTH = 0.5;
+
+    // Animate particles: move towards original pos, repel from mouse
+    function animate() {
+      draw();
+      for (let p of particles) {
+        // spring force towards original position
+        let dx = p.ox - p.x;
+        let dy = p.oy - p.y;
+        p.vx += dx * SPRING;
+        p.vy += dy * SPRING;
+
+        // friction
+        p.vx *= FRICTION;
+        p.vy *= FRICTION;
+
+        // apply velocity
+        p.x += p.vx;
+        p.y += p.vy;
+      }
+      requestAnimationFrame(animate);
     }
 
-    function applyForce(px, py) {
+    // Mouse interaction for repulsion
+    let mouse = { x: null, y: null };
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+      repelParticles(mouse.x, mouse.y);
+    });
+
+    canvas.addEventListener('touchmove', e => {
+      const rect = canvas.getBoundingClientRect();
+      if (e.touches.length > 0) {
+        mouse.x = e.touches[0].clientX - rect.left;
+        mouse.y = e.touches[0].clientY - rect.top;
+        repelParticles(mouse.x, mouse.y);
+      }
+    });
+
+    canvas.addEventListener('mouseleave', e => {
+      mouse.x = null;
+      mouse.y = null;
+    });
+
+    // Repel particles from mouse
+    function repelParticles(mx, my) {
       for (let p of particles) {
-        const dx = px - p.x;
-        const dy = py - p.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < 50) {
-          const angle = Math.atan2(dy, dx);
-          const force = (50 - dist) / 50;
-          p.x -= Math.cos(angle) * force * 10;
-          p.y -= Math.sin(angle) * force * 10;
-        } else {
-          p.x += (p.ox - p.x) * 0.08;
-          p.y += (p.oy - p.y) * 0.08;
+        let dx = p.x - mx;
+        let dy = p.y - my;
+        let dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < REPULSION_RADIUS) {
+          let angle = Math.atan2(dy, dx);
+          let force = (REPULSION_RADIUS - dist) / REPULSION_RADIUS * REPULSION_STRENGTH;
+          p.vx += Math.cos(angle) * force;
+          p.vy += Math.sin(angle) * force;
         }
       }
     }
 
-    canvas.addEventListener("mousemove", function (e) {
-      const rect = canvas.getBoundingClientRect();
-      applyForce(e.clientX - rect.left, e.clientY - rect.top);
-    });
-
-    canvas.addEventListener("touchmove", function (e) {
-      const touch = e.touches[0];
-      const rect = canvas.getBoundingClientRect();
-      applyForce(touch.clientX - rect.left, touch.clientY - rect.top);
-    });
-
-    animateParticles();
+    animate();
   </script>
 </body>
 </html>
