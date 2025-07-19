@@ -1,0 +1,41 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #fce4ec, #f3e5f5);
+  color: #8B0000;
+  text-align: center;
+  padding: 30px;
+}
+
+h1 {
+  font-size: 3em;
+  color: #5f0000; /* softened dark red for better contrast */
+  margin-bottom: 0.5em;
+  text-shadow: 1px 1px 3px rgba(255, 100, 100, 0.7); /* softened shadow */
+}
+
+.poem, .letter {
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  padding: 30px;
+  margin: 20px auto;
+  max-width: 700px;
+}
+
+.poem {
+  font-style: italic;
+  color: #b22222; /* firebrick for poetic tone */
+}
+
+canvas {
+  display: block;
+  margin: 40px auto;
+  background: transparent;
+  border-radius: 12px;
+  transition: transform 0.2s ease-in-out;
+}
+
+canvas:hover {
+  transform: scale(1.02);
+}
