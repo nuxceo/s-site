@@ -79,43 +79,30 @@
   <script>
     const canvas = document.getElementById("heartCanvas");
     const ctx = canvas.getContext("2d");
-    let particles = [];
-    const spacing = 10;
+    const particles = [];
+    const spacing = 6;
 
-    function heartShape(x, y, scale) {
-      const result = [];
-      for (let a = 0; a < Math.PI * 2; a += 0.05) {
-        const px = 16 * Math.pow(Math.sin(a), 3);
-        const py = 13 * Math.cos(a) - 5 * Math.cos(2 * a) - 2 * Math.cos(3 * a) - Math.cos(4 * a);
-        result.push({ x: x + px * scale, y: y - py * scale });
-      }
-      return result;
+    function isInHeart(x, y, scale = 1) {
+      const tx = (x - canvas.width / 2) / scale / 16;
+      const ty = (canvas.height / 2 - y) / scale;
+      const a = Math.pow(tx * tx + ty * ty - 1, 3) - tx * tx * ty * ty * ty;
+      return a <= 0;
     }
 
-    function fillHeartArea(centerX, centerY, scale) {
-      const area = [];
-      for (let x = 0; x <= canvas.width; x += spacing) {
-        for (let y = 0; y <= canvas.height; y += spacing) {
-          const tx = (x - centerX) / scale / 16;
-          const ty = (centerY - y) / scale;
-          const eq = Math.pow(tx, 2) + Math.pow(ty - Math.pow(tx, 1/3), 2);
-          if (isNaN(eq)) continue;
-          if (ty < 1.5 && eq < 1.3) {
-            area.push({ x: x, y: y, ox: x, oy: y });
-          }
+    for (let x = 0; x < canvas.width; x += spacing) {
+      for (let y = 0; y < canvas.height; y += spacing) {
+        if (isInHeart(x, y, 10)) {
+          particles.push({ x, y, ox: x, oy: y });
         }
       }
-      return area;
     }
-
-    particles = fillHeartArea(250, 250, 10);
 
     function drawParticles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       for (let p of particles) {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = "#ec407a";
+        ctx.arc(p.x, p.y, 1.8, 0, Math.PI * 2);
+        ctx.fillStyle = "#8B0000";
         ctx.fill();
       }
     }
@@ -133,11 +120,11 @@
         if (dist < 50) {
           const angle = Math.atan2(dy, dx);
           const force = (50 - dist) / 50;
-          p.x -= Math.cos(angle) * force * 12;
-          p.y -= Math.sin(angle) * force * 12;
+          p.x -= Math.cos(angle) * force * 10;
+          p.y -= Math.sin(angle) * force * 10;
         } else {
-          p.x += (p.ox - p.x) * 0.07;
-          p.y += (p.oy - p.y) * 0.07;
+          p.x += (p.ox - p.x) * 0.08;
+          p.y += (p.oy - p.y) * 0.08;
         }
       }
     }
