@@ -3,43 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Perfect Filled Heart for Sana</title>
+  <title>For My Sweet Sana</title>
   <style>
-    /* ---- Body and General Styling ---- */
+    /* Background and body */
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #fce4ec, #f3e5f5);
+      background: linear-gradient(135deg, #e0c3fc, #8ec5fc); /* Soft purple-blue gradient */
       color: #8B0000;
       text-align: center;
-      padding: 30px;
+      padding: 40px 20px;
       overflow-x: hidden;
       min-height: 100vh;
       position: relative;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
+
     h1 {
       font-size: 3em;
       color: #5f0000;
-      margin-bottom: 0.5em;
+      margin-bottom: 1em;
       text-shadow: 1px 1px 3px rgba(255, 100, 100, 0.7);
       position: relative;
       z-index: 10;
+      user-select: none;
     }
-    .poem, .letter {
-      background: rgba(255, 255, 255, 0.85);
-      border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      padding: 30px;
-      margin: 20px auto;
-      max-width: 700px;
-      backdrop-filter: blur(6px);
+
+    /* Glass container common style */
+    .glass-container {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 30px;
+      box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 40px 30px;
+      margin: 30px auto;
+      max-width: 720px;
+      color: #4b0000;
       position: relative;
       z-index: 10;
     }
+
     .poem {
       font-style: italic;
       color: #b22222;
+      line-height: 1.6;
+      font-size: 1.2em;
     }
+
+    .letter {
+      font-size: 1.1em;
+      line-height: 1.5;
+    }
+
     .letter .typing {
       display: inline-block;
       overflow: hidden;
@@ -48,28 +66,35 @@
       animation: typing 6s steps(60, end), blink-caret 0.75s step-end infinite;
       max-width: 100%;
     }
+
     @keyframes typing {
       from { width: 0 }
       to { width: 100% }
     }
+
     @keyframes blink-caret {
       from, to { border-color: transparent }
       50% { border-color: #8B0000 }
     }
-    canvas {
+
+    /* Heart Canvas */
+    #heartCanvas {
       display: block;
-      margin: 40px auto;
+      margin: 0 auto;
+      border-radius: 30px;
+      box-shadow: 0 0 40px rgba(139, 0, 0, 0.4);
+      transition: transform 0.25s ease-in-out;
+      cursor: pointer;
       background: transparent;
-      border-radius: 12px;
-      transition: transform 0.2s ease-in-out;
-      box-shadow: 0 0 20px rgba(139, 0, 0, 0.2);
-      position: relative;
-      z-index: 10;
+      max-width: 100%;
+      height: auto;
     }
-    canvas:hover {
-      transform: scale(1.02);
+
+    #heartCanvas:hover {
+      transform: scale(1.05);
     }
-    /* Floating Hearts */
+
+    /* Floating hearts */
     .floating-heart {
       position: absolute;
       width: 20px;
@@ -91,22 +116,40 @@
         opacity: 0;
       }
     }
+
     footer {
-      margin-top: 60px;
-      font-size: 1.2em;
+      margin-top: 50px;
+      font-size: 1.3em;
       color: #880e4f;
       font-weight: bold;
       position: relative;
       z-index: 10;
+      user-select: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 2.2em;
+      }
+      .glass-container {
+        padding: 30px 20px;
+        max-width: 90%;
+      }
+      .poem, .letter {
+        font-size: 1em;
+      }
     }
   </style>
 </head>
 <body>
   <h1>For My Sweet Sana</h1>
 
-  <canvas id="heartCanvas" width="600" height="600"></canvas>
+  <div class="glass-container">
+    <canvas id="heartCanvas" width="700" height="700" aria-label="Heart made of dots"></canvas>
+  </div>
 
-  <div class="poem">
+  <div class="glass-container poem">
     <p>In every smile, in every star,<br />
     I see your light from near and far.<br />
     Your love, a song that soothes my soul,<br />
@@ -118,7 +161,7 @@
     Know you're still my brightest spark.</p>
   </div>
 
-  <div class="letter">
+  <div class="glass-container letter">
     <h2>A Letter from My Heart</h2>
     <p class="typing">My dearest Sana,<br />
       I made this little website just for you, to show how much you mean to me. I want you to know that I love you deeply, endlessly, and with all my heart. Sometimes, I make mistakes — not because I don’t care, but because I’m human. Please know that I never mean to hurt you.<br />
@@ -141,53 +184,28 @@
     const canvas = document.getElementById("heartCanvas");
     const ctx = canvas.getContext("2d");
 
-    // Store particles in array
+    // Particle params
     const particles = [];
-
-    // Heart particle parameters
-    const PARTICLE_RADIUS = 2;
-    const PARTICLE_GAP = 4; // smaller gap = denser particles
-    const HEART_SCALE = 15;
+    const PARTICLE_RADIUS = 2.5;
+    const PARTICLE_GAP = 3.5; // smaller gap = denser heart
+    const HEART_SCALE = 20;    // larger scale for bigger heart
     const CENTER_X = canvas.width / 2;
-    const CENTER_Y = canvas.height / 2 + 40;
-
-    // Generate heart shape points using parametric formula (filled heart)
-    // Parametric heart formula:
-    // x = 16 * sin(t)^3
-    // y = 13*cos(t) - 5*cos(2t) - 2*cos(3t) - cos(4t)
-    // for t in [0, 2*PI]
-    // We fill by sweeping over small grid points and check if inside heart polygon.
-
-    // Function to check if point is inside heart shape (using parametric boundary)
-    function heartFunction(t) {
-      return {
-        x: 16 * Math.pow(Math.sin(t), 3),
-        y: 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)
-      };
-    }
-
-    // For each particle candidate, check if inside heart polygon approx.
-    // Because the heart shape is symmetrical, use a function to check inside the shape.
-
-    // We'll use the heart implicit function: (x^2 + y^2 -1)^3 - x^2 y^3 <= 0 is inside
-    // We'll scale x and y appropriately
+    const CENTER_Y = canvas.height / 2 + 50;
 
     function isInsideHeart(x, y) {
-      // scale down
       let tx = x / HEART_SCALE;
       let ty = y / HEART_SCALE;
-      let val = Math.pow(tx*tx + ty*ty -1, 3) - tx*tx*ty*ty*ty;
-      return val <= 0;
+      return Math.pow(tx*tx + ty*ty - 1, 3) - tx*tx*ty*ty*ty <= 0;
     }
 
-    // Generate particles grid inside the canvas, keep those inside heart shape
+    // Generate particles inside heart shape
     for(let x = -CENTER_X; x < CENTER_X; x += PARTICLE_GAP) {
       for(let y = -CENTER_Y; y < CENTER_Y; y += PARTICLE_GAP) {
         if (isInsideHeart(x, y)) {
           particles.push({
             x: CENTER_X + x,
             y: CENTER_Y - y,
-            ox: CENTER_X + x, // original position
+            ox: CENTER_X + x,
             oy: CENTER_Y - y,
             vx: 0,
             vy: 0
@@ -196,73 +214,41 @@
       }
     }
 
-    // Draw particles
     function draw() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = "#8B0000";
-      for (let p of particles) {
+      for (const p of particles) {
         ctx.beginPath();
-        ctx.arc(p.x, p.y, PARTICLE_RADIUS, 0, 2 * Math.PI);
+        ctx.arc(p.x, p.y, PARTICLE_RADIUS, 0, Math.PI * 2);
         ctx.fill();
       }
     }
 
-    // Physics variables for smooth animation
-    const SPRING = 0.1;
-    const FRICTION = 0.85;
-    const REPULSION_RADIUS = 60;
-    const REPULSION_STRENGTH = 0.5;
+    const SPRING = 0.12;
+    const FRICTION = 0.82;
+    const REPULSION_RADIUS = 70;
+    const REPULSION_STRENGTH = 0.6;
 
-    // Animate particles: move towards original pos, repel from mouse
     function animate() {
       draw();
-      for (let p of particles) {
-        // spring force towards original position
+      for (const p of particles) {
         let dx = p.ox - p.x;
         let dy = p.oy - p.y;
         p.vx += dx * SPRING;
         p.vy += dy * SPRING;
-
-        // friction
         p.vx *= FRICTION;
         p.vy *= FRICTION;
-
-        // apply velocity
         p.x += p.vx;
         p.y += p.vy;
       }
       requestAnimationFrame(animate);
     }
 
-    // Mouse interaction for repulsion
-    let mouse = { x: null, y: null };
-    canvas.addEventListener('mousemove', e => {
-      const rect = canvas.getBoundingClientRect();
-      mouse.x = e.clientX - rect.left;
-      mouse.y = e.clientY - rect.top;
-      repelParticles(mouse.x, mouse.y);
-    });
-
-    canvas.addEventListener('touchmove', e => {
-      const rect = canvas.getBoundingClientRect();
-      if (e.touches.length > 0) {
-        mouse.x = e.touches[0].clientX - rect.left;
-        mouse.y = e.touches[0].clientY - rect.top;
-        repelParticles(mouse.x, mouse.y);
-      }
-    });
-
-    canvas.addEventListener('mouseleave', e => {
-      mouse.x = null;
-      mouse.y = null;
-    });
-
-    // Repel particles from mouse
     function repelParticles(mx, my) {
-      for (let p of particles) {
+      for (const p of particles) {
         let dx = p.x - mx;
         let dy = p.y - my;
-        let dist = Math.sqrt(dx * dx + dy * dy);
+        let dist = Math.sqrt(dx*dx + dy*dy);
         if (dist < REPULSION_RADIUS) {
           let angle = Math.atan2(dy, dx);
           let force = (REPULSION_RADIUS - dist) / REPULSION_RADIUS * REPULSION_STRENGTH;
@@ -271,6 +257,20 @@
         }
       }
     }
+
+    canvas.addEventListener('mousemove', e => {
+      const rect = canvas.getBoundingClientRect();
+      repelParticles(e.clientX - rect.left, e.clientY - rect.top);
+    });
+
+    canvas.addEventListener('touchmove', e => {
+      const rect = canvas.getBoundingClientRect();
+      if (e.touches.length > 0) {
+        repelParticles(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+      }
+    });
+
+    canvas.addEventListener('mouseleave', () => {});
 
     animate();
   </script>
